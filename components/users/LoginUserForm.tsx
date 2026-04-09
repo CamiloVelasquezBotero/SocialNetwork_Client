@@ -13,7 +13,7 @@ export default function LoginUserForm({ children }: { children: React.ReactNode 
 
    useEffect(() => {
       const existsToken = localStorage.getItem('token')
-      if(existsToken) {
+      if (existsToken) {
          setToken(existsToken)
          router.push('/dashboard')
       }

@@ -1,3 +1,4 @@
+'use server'
 import { prisma } from "@/src/prisma-connection/prisma";
 import jwt from 'jsonwebtoken'
 

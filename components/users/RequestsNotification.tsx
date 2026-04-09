@@ -28,10 +28,10 @@ export default function RequestsNotification({request}:RequestsNotificationProps
         </div>
         <div className='flex gap-5'>
           <button 
-            className='shadow-xl p-1 bg-sky-700 hover:bg-sky-800 flex gap-1 items-center cursor-pointer rounded-md text-white font-black'
+            className='shadow-xl p-1 ml-3 bg-sky-700 hover:bg-sky-800 flex gap-1 items-center cursor-pointer rounded-md text-white font-black'
             onClick={() => handleRequest('accept')}
           >
-             Agregar <UserPlusIcon className='w-6'/>
+             Acceptar <UserPlusIcon className='w-6'/>
           </button>
           <button 
             className='shadow-xl p-1 bg-red-700 hover:bg-red-800 flex gap-1 items-center cursor-pointer rounded-md text-white font-black'

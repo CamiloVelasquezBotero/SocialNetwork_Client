@@ -47,19 +47,19 @@ export default function PopOverNotification() {
             >
                <div className="h-px bg-white/5" />
                <div className="pb-4">
-                     {requestsReceived.length ? (
-                        <ul>
-                           {requestsReceived.map(request => (
-                              <RequestsNotification
-                                 key={request.id}
-                                 request={request}
-                              />
-                           ))}
-                        </ul>
-                     ) : (
-                        <p className='text-white text-lg mt-2 text-center'>Por el momento no tienes notificaciones</p>
-                     )}
-                  </div>
+                  {requestsReceived.length ? (
+                     <ul>
+                        {requestsReceived.map(request => (
+                           <RequestsNotification
+                              key={request.id}
+                              request={request}
+                           />
+                        ))}
+                     </ul>
+                  ) : (
+                     <p className='text-white text-lg mt-2 text-center'>Por el momento no tienes notificaciones</p>
+                  )}
+               </div>
             </MenuItems>
          </Menu>
       </div>

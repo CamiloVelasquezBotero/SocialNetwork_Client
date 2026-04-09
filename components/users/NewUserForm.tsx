@@ -42,28 +42,28 @@ export default function NewUserForm({children}:{children: React.ReactNode}) {
    }
 
    return (
-      <div className='grid grid-cols-2 justify-center items-center my-10 mx-10'>
-         <p className="font-black text-4xl text-center mt-2 hover:text-slate-700 transition-all m-20 text-shadow-lg">
+      <div className='flex flex-col lg:grid lg:grid-cols-2 justify-center items-center my-6 mx-4 lg:my-10 lg:mx-10 px-4 lg:px-0'>
+         <p className="font-black text-2xl sm:text-3xl lg:text-4xl text-center mt-2 hover:text-slate-700 transition-all mx-5 mb-8 lg:m-20 text-shadow-lg">
             Create an {""}
             <span className="text-indigo-800 hover:text-indigo-700">account</span> {""}
             to start to {""}
             <span className="text-indigo-800 hover:text-indigo-700">talk with your friends</span>
          </p>
 
-         <div className='bg-white rounded-lg shadow-md hover:shadow-xl transition-all p-10'>
-            <p className="font-black text-5xl text-center text-indigo-700 text-shadow-lg">Create Your Account</p>
+         <div className='bg-white rounded-lg shadow-md hover:shadow-xl transition-all p-5 sm:p-8 lg:p-10 w-full max-w-lg lg:max-w-none'>
+            <p className="font-black text-3xl sm:text-4xl lg:text-5xl text-center text-indigo-700 text-shadow-lg">Create Your Account</p>
             <form
                action={handleCreateUser}
-               className='flex flex-col items-center mt-10 gap-5 w-full'
+               className='flex flex-col items-center mt-6 sm:mt-10 gap-4 sm:gap-5 w-full'
             >
               {children}
 
             <div>
-                <p className="text-lg text-center transition-all">
+                <p className="text-base lg:text-lg text-center transition-all">
                     ¿Ya tienes una cuenta?
                     <Link href={'/'}><span className="text-indigo-800 hover:text-indigo-900 font-bold"> Inicia Sesión</span></Link>
                 </p>
-                <p className="text-lg text-center transition-all">
+                <p className="text-base lg:text-lg text-center transition-all">
                     ¿Olvidaste tu contraseña?
                     <Link href={'/recover-password'}><span className="text-indigo-800 hover:text-indigo-900 transition-all font-bold"> Recupera tu cuenta</span></Link>
                 </p>

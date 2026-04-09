@@ -4,13 +4,13 @@ import Header from "@/components/Header";
 import ToastNotification from "@/components/ui/ToastNotification";
 
 export const metadata: Metadata = {
-  title: "Chat_Online-SWR-NEXT",
-  description: "Chat de prueba con SWR",
+  title: "Chat_Online-Socket.io-NextJs",
+  description: "Red Social con chat en tiempo real usando Socket.io"
 };
 
 export default function RootLayout({
   children,
-}:{children: React.ReactNode}) {
+}: { children: React.ReactNode }) {
 
   return (
     <html lang="en">

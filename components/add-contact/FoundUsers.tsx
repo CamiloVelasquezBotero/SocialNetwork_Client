@@ -9,7 +9,7 @@ export default function FoundUsers({users}:FoundUsersProps) {
   return (
     <>
         {users.length ? (
-          <ul className="flex flex-col gap-1 h-95 overflow-y-scroll p-1 shadow-xl">
+          <ul className="flex flex-col gap-1 h-auto max-h-[380px] lg:h-95 overflow-y-auto p-1 shadow-xl w-full px-2 sm:px-4">
             {users.map((user) => (
                 <User
                   key={user.email}
@@ -18,7 +18,7 @@ export default function FoundUsers({users}:FoundUsersProps) {
             ))}
           </ul>
         ) : (
-          <p className="font-bold text-2xl text-slate-600 mt-10">No se encontraron usuarios similares</p>
+          <p className="font-bold text-lg sm:text-2xl text-slate-600 mt-10 text-center">No se encontraron usuarios similares</p>
         )}
     </>
   )

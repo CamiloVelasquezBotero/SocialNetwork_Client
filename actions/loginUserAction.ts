@@ -4,7 +4,7 @@ import { userLoginSchema } from "@/src/schema-zod";
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
-export async function loginUser(data: unknown) {
+export async function loginUser(data: unknown) { // TODO: VERIFICAR EL TIPADO POR QUE AQUI DEBE IR FormData como type, pasarle los valores por el name del from
     const result = userLoginSchema.safeParse(data)
     if (!result.success) {
         return { errors: result.error.issues }
@@ -45,5 +45,6 @@ export async function loginUser(data: unknown) {
         return {token, dataUser}
     } catch (error) {
         console.log('There was an error when try to log in', error)
+        return {error: 'There was an error when try to log in'}
     }
 }

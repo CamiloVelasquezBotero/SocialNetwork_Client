@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { AcceptRequest, FriendOnline, FriendsOnline, FriendsOnlineId, UserData } from './types';
+import { AcceptRequest, CurrentChat, FriendOnline, FriendsOnline, FriendsOnlineId, Message, UserData } from './types';
 import api from './lib/axios';
 import { acceptRequestSchema, rejectRequestSchema, removeFriendSchema, userDataSchema, userIdSchema } from './schema-zod';
 import { toast } from 'react-toastify';
@@ -16,31 +16,46 @@ const initialValues = {
         requestsSent: [],
         requestsReceived: []
     },
-    friendsOnline: []
+    friendsOnline: [],
+    idFriendCurrentChat: 0,
+    currentChat: {
+        createdAt: new Date(),
+        id: 0,
+        messages: [],
+        users: []
+    }
 }
 
 interface Store {
     token: string,
     userData: UserData,
     friendsOnline: FriendsOnline,
+    idFriendCurrentChat: FriendOnline['id'],
+    currentChat: CurrentChat
 
-    setToken: (token:string) => void,
+    setToken: (token: string) => void,
     getUserData: () => void,
     logOut: () => void,
-    sendFriendRequest: (id:UserData['id']) => void,
-    acceptRequest: (dataRequest:AcceptRequest) => void,
-    removeFriend: (friendId:UserData['id']) => void,
-    updateOnlineFriends: (friendsOnline:FriendsOnlineId) => void,
-    updateUserDisconnected: (friendId:FriendOnline['id']) => void,
-    updateUserConnected: (friendId:FriendOnline['id']) => void,
-    updateFriendOnline: (dataFriend:FriendOnline) => void,
-    updateFriendRemovedNotification: (friendId:FriendOnline['id']) => void,
+    sendFriendRequest: (id: UserData['id']) => void,
+    acceptRequest: (dataRequest: AcceptRequest) => void,
+    removeFriend: (friendId: UserData['id']) => void,
+    updateOnlineFriends: (friendsOnline: FriendsOnlineId) => void,
+    updateUserDisconnected: (friendId: FriendOnline['id']) => void,
+    updateUserConnected: (friendId: FriendOnline['id']) => void,
+    updateFriendOnline: (dataFriend: FriendOnline) => void,
+    updateFriendRemovedNotification: (friendId: FriendOnline['id']) => void,
+    setCurrentIdFriendChat: (chatId: number) => void,
+    setCurrentChat: (chatId: CurrentChat) => void,
+    updateMessageCurrentChat: (newMessage: Message) => void,
+    updateNewMessageReceived: (newMessage: Message) => void,
 }
 
 export const useStore = create<Store>((set, get) => ({
     token: initialValues.token,
     userData: initialValues.userData,
     friendsOnline: initialValues.friendsOnline,
+    idFriendCurrentChat: initialValues.idFriendCurrentChat,
+    currentChat: initialValues.currentChat,
 
     setToken: (token) => {
         set(() => ({
@@ -49,11 +64,11 @@ export const useStore = create<Store>((set, get) => ({
     },
     getUserData: async () => {
         const token = get().token
-        const url = '/dashboard/api'
+        const url = '/api/user'
         try {
             const { data } = await api.get(url, { headers: { Authorization: `Bearer ${token}` } })
             const result = userDataSchema.safeParse(data)
-            if(result.success) {
+            if (result.success) {
                 set(() => ({
                     userData: {
                         id: result.data.id,
@@ -94,7 +109,7 @@ export const useStore = create<Store>((set, get) => ({
                 return false
             }
             toast.success('Friend Request sent successfully')
-            socket.emit('friend-request-sent', {idReceiver: id})
+            socket.emit('friend-request-sent', { idReceiver: id })
         } catch (error) {
             console.log('There was an error trying to send friend request: ' + error)
         }
@@ -102,17 +117,17 @@ export const useStore = create<Store>((set, get) => ({
 
     acceptRequest: async (dataRequest) => {
         const token = get().token
-        const url = '/dashboard/api'
+        const url = '/api/user'
         try {
-            const { data } = await api.patch(url, dataRequest, {headers: {Authorization: `Bearer ${token}`}})
-            if(dataRequest.action === 'accept') {
+            const { data } = await api.patch(url, dataRequest, { headers: { Authorization: `Bearer ${token}` } })
+            if (dataRequest.action === 'accept') {
                 // ACCEPT
                 const result = acceptRequestSchema.safeParse(data)
-                if(!result.success) {
+                if (!result.success) {
                     toast.error('There was an error')
                     return
                 }
-    
+
                 // Actualizar Store
                 set((state) => ({
                     userData: {
@@ -128,24 +143,24 @@ export const useStore = create<Store>((set, get) => ({
                         id: get().userData.id,
                         name: get().userData.name,
                         email: get().userData.email,
-                    }, 
-                    idSender: dataRequest.idSender, 
+                    },
+                    idSender: dataRequest.idSender,
                     action: dataRequest.action
-                }, (isConnected:boolean) => { // Si recibimos true es por que esta conectado, entonces actualizamos los friendsOnline
-                    if(isConnected) {
+                }, (isConnected: boolean) => { // Si recibimos true es por que esta conectado, entonces actualizamos los friendsOnline
+                    if (isConnected) {
                         // Actualizamos friendsOnline
                         const newFriendAdded = result.data.user.friends.find(friend => friend.id === dataRequest.idSender)
-                        if(newFriendAdded) {
+                        if (newFriendAdded) {
                             set((state) => ({
                                 friendsOnline: [...state.friendsOnline, newFriendAdded]
-                            }))    
+                            }))
                         }
                     }
                 })
             } else {
                 // DECLINE
                 const result = rejectRequestSchema.safeParse(data)
-                if(!result.success) {
+                if (!result.success) {
                     toast.error('There was an error')
                     return
                 }
@@ -166,12 +181,12 @@ export const useStore = create<Store>((set, get) => ({
 
     removeFriend: async (friendId) => {
         const token = get().token
-        const url = `/dashboard/api?friendId=${friendId}`
+        const url = `/api/user?friendId=${friendId}`
 
         try {
-            const { data } = await api.delete(url, {headers: {Authorization: `Bearer ${token}`}})
+            const { data } = await api.delete(url, { headers: { Authorization: `Bearer ${token}` } })
             const result = removeFriendSchema.safeParse(data)
-            if(!result.success) {
+            if (!result.success) {
                 toast.error('There was an error')
                 return
             }
@@ -188,13 +203,14 @@ export const useStore = create<Store>((set, get) => ({
             toast.success(result.data.message)
 
             // Socket de eliminacion para actualizacion de estado en el otro usuario
-            socket.emit('friend-removed', {userId: get().userData.id, userRemovedId: friendId})
+            socket.emit('friend-removed', { userId: get().userData.id, userRemovedId: friendId })
         } catch (error) {
             console.log(`There was an error removing the friend: ${error}`)
             toast.error('There was an error')
         }
     },
 
+    // TODO: Este socket se esta envindo a todos los usuarios conectados asi no sean amigos de esta persona, arreglar para enviar unicamente el socket a los amigos
     updateOnlineFriends: (friendsOnline) => {
         const friends = get().userData.friends
         const dataFriendsOnline = friends.filter(friend => friendsOnline.includes(friend.id))
@@ -216,10 +232,10 @@ export const useStore = create<Store>((set, get) => ({
         const friends = get().userData.friends
         const friendsOnline = get().friendsOnline
         const existsFriend = friends.find(friend => friend.id === friendId)
-        
-        if(existsFriend) {
+
+        if (existsFriend) {
             const existsFriendConnected = friendsOnline.find(friend => friend.id === existsFriend.id)
-            if(!existsFriendConnected) {
+            if (!existsFriendConnected) {
                 const friendsOnlineUpdated = [...friendsOnline, existsFriend]
                 set(() => ({
                     friendsOnline: friendsOnlineUpdated
@@ -232,7 +248,7 @@ export const useStore = create<Store>((set, get) => ({
         const alreadyFriends = get().userData.friends.find(friend => friend.id === dataFriend.id)
         const alreadyOnline = get().friendsOnline.find(friend => friend.id === dataFriend.id)
 
-        if(!alreadyFriends) {
+        if (!alreadyFriends) {
             set((state) => ({
                 userData: {
                     ...state.userData,
@@ -240,7 +256,7 @@ export const useStore = create<Store>((set, get) => ({
                 }
             }))
             toast.success(`${dataFriend.name}, ¡acaba de aceptar tu solicitud!`)
-            if(!alreadyOnline) {
+            if (!alreadyOnline) {
                 set((state) => ({
                     friendsOnline: [...state.friendsOnline, dataFriend]
                 }))
@@ -256,6 +272,46 @@ export const useStore = create<Store>((set, get) => ({
             },
             friendsOnline: state.friendsOnline.filter(friend => friend.id !== friendId)
         }))
+    },
+
+    setCurrentIdFriendChat: (friendId) => {
+        set(() => ({
+            idFriendCurrentChat: friendId
+        }))
+    },
+
+    setCurrentChat: (chat) => {
+        set(() => ({
+            currentChat: chat
+        }))
+    },
+
+    updateMessageCurrentChat: (newMessage) => {
+        const alreadyExists = get().currentChat.messages.some(msg => msg.id === newMessage.id)
+        if (!alreadyExists) {
+            set((state) => ({
+                currentChat: {
+                    ...state.currentChat,
+                    messages: [...state.currentChat.messages, newMessage]
+                }
+            }))
+
+            // Send the socket so we can update the other user
+            const idReceiver = get().idFriendCurrentChat
+            socket.emit('new-message-sent', { newMessage, idReceiver })
+        }
+    },
+
+    updateNewMessageReceived: (newMessage) => {
+        const alreadyExists = get().currentChat.messages.some(msg => msg.id === newMessage.id)
+        if (!alreadyExists) {
+            set((state) => ({
+                currentChat: {
+                    ...state.currentChat,
+                    messages: [...state.currentChat.messages, newMessage]
+                }
+            }))
+        }
     }
-    
+
 }))

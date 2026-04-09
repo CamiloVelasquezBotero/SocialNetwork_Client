@@ -68,3 +68,36 @@ export const removeFriendSchema = z.object({
     friends: z.array(friendSchema),
   })
 })
+
+export const usersSchema = z.object({
+  userA: z.number(),
+  userB: z.number()
+})
+
+export const messageSchema = z.object({
+  id: z.number(),
+  content: z.string(),
+  senderId: z.number(),
+  createdAt: z.coerce.date(),
+  sender: z.object({
+    id: z.number(),
+    name: z.string(),
+    email: z.string(),
+  })
+});
+
+
+export const chatSchema = z.object({
+  createdAt: z.date(),
+  id: z.number(),
+  messages: z.array(messageSchema),
+  users: z.array(z.object({
+    id: z.number(),
+    chatId: z.number(),
+    user: z.object({
+      id: z.number(),
+      email: z.string(),
+      name: z.string(),
+    })
+  }))
+})
