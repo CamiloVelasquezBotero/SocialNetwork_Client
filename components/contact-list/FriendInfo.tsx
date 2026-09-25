@@ -37,9 +37,9 @@ export default function FriendInfo({friend}:UserInfoProps) {
   }
 
   return (
-    <li className='flex justify-between shadow-2xl p-2 rounded-2xl w-full h-auto min-h-[4rem]'>
-      <div className='flex items-center gap-2 sm:gap-5 min-w-0'>
-        <img src="/pruebaUser.jpg" alt="friendPhoto" className='w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0'/>
+    <li className='flex justify-between items-center shadow-md hover:shadow-lg transition-all p-3 bg-slate-50 border border-slate-200/80 rounded-2xl w-full h-fit'>
+      <div className='flex items-center gap-3 sm:gap-4 min-w-0'>
+        <img src="/pruebaUser.jpg" alt="friendPhoto" className='w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover border border-slate-300 flex-shrink-0'/>
         <div className='min-w-0'>
           <p className='font-black text-sm sm:text-base truncate'>{friend.name}</p>
           <p className='text-slate-600 font-bold text-xs sm:text-sm truncate'>{friend.email}</p>

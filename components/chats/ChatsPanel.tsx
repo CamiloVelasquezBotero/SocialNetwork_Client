@@ -78,9 +78,9 @@ export default function ChatsPanel() {
                                 key={msg.id}
                             >
                                 <div
-                                    className={`px-3 py-2 rounded-lg max-w-[70%] ${msg.senderId === userId
+                                    className={`px-3 py-2 rounded-lg max-w-[70%] shadow-sm ${msg.senderId === userId
                                         ? "bg-indigo-500 text-white ml-auto"
-                                        : "bg-gray-200 text-black"
+                                        : "bg-gray-300 text-gray-800 border border-gray-400/40"
                                         }`}
                                 >
                                     <p>{msg.content}</p>
