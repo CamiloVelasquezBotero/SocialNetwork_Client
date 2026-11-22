@@ -5,3 +5,19 @@
   Applies dark: styles when <html> has the "dark" class.
 */
 @custom-variant dark (&:is(.dark *));
+
+/* ── Message slide-in animation ── */
+@keyframes message-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-message-in {
+  animation: message-in 0.22s ease-out both;
+}

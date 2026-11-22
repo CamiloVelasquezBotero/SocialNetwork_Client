@@ -24,6 +24,7 @@ export default function ChatsPanel() {
 
     const messagesRef = useRef<HTMLDivElement | null>(null)
     const textareaRef = useRef<HTMLTextAreaElement | null>(null)
+    const bottomRef = useRef<HTMLDivElement | null>(null)
 
     // Escuchamos cambios en el state apra poder mostrar lo que va ocurriendo
     const handleSendMessage = async (e?: React.FormEvent) => {
@@ -88,10 +89,10 @@ export default function ChatsPanel() {
         getChat()
     }, [idFriendCurrentChat])
 
-    // Hacemos scroll hacia abajo cada vez que se envie un mensaje
+    // Smooth scroll to bottom every time a new message arrives
     useEffect(() => {
-        if (!messagesRef.current) return
-        messagesRef.current.scrollTop = messagesRef.current.scrollHeight
+        if (!bottomRef.current) return
+        bottomRef.current.scrollIntoView({ behavior: 'smooth' })
     }, [currentChat.messages])
 
     const autoResize = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -150,7 +151,7 @@ export default function ChatsPanel() {
                         {currentChat.messages.map(msg => (
                             <div
                                 key={msg.id}
-                                className={`flex mb-2 ${msg.senderId === userId ? 'justify-end' : 'justify-start'}`}
+                                className={`flex mb-2 animate-message-in ${msg.senderId === userId ? 'justify-end' : 'justify-start'}`}
                             >
                                 {msg.senderId !== userId && (
                                     <img
@@ -173,6 +174,8 @@ export default function ChatsPanel() {
                                 </div>
                             </div>
                         ))}
+                        {/* Invisible anchor at the bottom — smooth scroll targets this */}
+                        <div ref={bottomRef} />
                     </div>
 
                     {/* Message form */}
