@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { AcceptRequest, CurrentChat, FriendOnline, FriendsOnline, FriendsOnlineId, Message, UserData } from './types';
+import { AcceptRequest, CurrentChat, FriendOnline, FriendsOnline, FriendsOnlineId, IncomingNotification, Message, UserData } from './types';
 import api from './lib/axios';
 import { acceptRequestSchema, rejectRequestSchema, removeFriendSchema, userDataSchema, userIdSchema } from './schema-zod';
 import { toast } from 'react-toastify';
@@ -8,10 +8,12 @@ import socket from './lib/socket';
 
 const initialValues = {
     token: '',
+    darkMode: false,
     userData: {
         id: 0,
         name: '',
         email: '',
+        profileImage: null as string | null | undefined,
         friends: [],
         requestsSent: [],
         requestsReceived: []
@@ -23,19 +25,24 @@ const initialValues = {
         id: 0,
         messages: [],
         users: []
-    }
+    },
+    incomingNotifications: [] as IncomingNotification[]
 }
 
 interface Store {
     token: string,
+    darkMode: boolean,
     userData: UserData,
     friendsOnline: FriendsOnline,
     idFriendCurrentChat: FriendOnline['id'],
-    currentChat: CurrentChat
+    currentChat: CurrentChat,
+    incomingNotifications: IncomingNotification[],
 
     setToken: (token: string) => void,
+    toggleDarkMode: () => void,
     getUserData: () => void,
     logOut: () => void,
+    updateProfileImage: (profileImage: string) => void,
     sendFriendRequest: (id: UserData['id']) => void,
     acceptRequest: (dataRequest: AcceptRequest) => void,
     removeFriend: (friendId: UserData['id']) => void,
@@ -47,21 +54,40 @@ interface Store {
     setCurrentIdFriendChat: (chatId: number) => void,
     setCurrentChat: (chatId: CurrentChat) => void,
     updateMessageCurrentChat: (newMessage: Message) => void,
+    confirmMessageSent: (tempId: number, realMessage: Message) => void,
     updateNewMessageReceived: (newMessage: Message) => void,
+    dismissIncomingNotification: (id: string) => void,
 }
 
 export const useStore = create<Store>((set, get) => ({
     token: initialValues.token,
+    darkMode: false,
     userData: initialValues.userData,
     friendsOnline: initialValues.friendsOnline,
     idFriendCurrentChat: initialValues.idFriendCurrentChat,
     currentChat: initialValues.currentChat,
+    incomingNotifications: initialValues.incomingNotifications,
 
     setToken: (token) => {
         set(() => ({
             token: token
         }))
     },
+
+    // Alterna entre modo claro y oscuro
+    toggleDarkMode: () => {
+        const newDarkMode = !get().darkMode
+        set(() => ({ darkMode: newDarkMode }))
+        // Guardamos la preferencia en localStorage
+        localStorage.setItem('darkMode', String(newDarkMode))
+        // Aplicamos la clase al <html>
+        if (newDarkMode) {
+            document.documentElement.classList.add('dark')
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+    },
+
     getUserData: async () => {
         const token = get().token
         const url = '/api/user'
@@ -74,6 +100,7 @@ export const useStore = create<Store>((set, get) => ({
                         id: result.data.id,
                         name: result.data.name,
                         email: result.data.email,
+                        profileImage: result.data.profileImage,
                         friends: result.data.friends,
                         requestsSent: result.data.requestsSent,
                         requestsReceived: result.data.requestsReceived,
@@ -91,6 +118,16 @@ export const useStore = create<Store>((set, get) => ({
         set(() => ({
             token: initialValues.token,
             userData: initialValues.userData
+        }))
+    },
+
+    // Actualiza la foto de perfil en el store sin tener que recargar datos
+    updateProfileImage: (profileImage) => {
+        set((state) => ({
+            userData: {
+                ...state.userData,
+                profileImage
+            }
         }))
     },
 
@@ -146,7 +183,7 @@ export const useStore = create<Store>((set, get) => ({
                     },
                     idSender: dataRequest.idSender,
                     action: dataRequest.action
-                }, (isConnected: boolean) => { // Si recibimos true es por que esta conectado, entonces actualizamos los friendsOnline
+                }, (isConnected: boolean) => {
                     if (isConnected) {
                         // Actualizamos friendsOnline
                         const newFriendAdded = result.data.user.friends.find(friend => friend.id === dataRequest.idSender)
@@ -175,7 +212,6 @@ export const useStore = create<Store>((set, get) => ({
             }
         } catch (error) {
             console.log(`There was an error accepting the request: ${error}`)
-            /* toast.error() */
         }
     },
 
@@ -255,7 +291,7 @@ export const useStore = create<Store>((set, get) => ({
                     friends: [...state.userData.friends, dataFriend]
                 }
             }))
-            toast.success(`${dataFriend.name}, ¡acaba de aceptar tu solicitud!`)
+            toast.success(`${dataFriend.name} just accepted your friend request!`)
             if (!alreadyOnline) {
                 set((state) => ({
                     friendsOnline: [...state.friendsOnline, dataFriend]
@@ -298,20 +334,63 @@ export const useStore = create<Store>((set, get) => ({
 
             // Send the socket so we can update the other user
             const idReceiver = get().idFriendCurrentChat
-            socket.emit('new-message-sent', { newMessage, idReceiver })
+            if (idReceiver) {
+                socket.emit('new-message-sent', { newMessage, idReceiver })
+            }
         }
     },
 
+    // Confirm message when DB finishes saving
+    confirmMessageSent: (tempId, realMessage) => {
+        set((state) => ({
+            currentChat: {
+                ...state.currentChat,
+                messages: state.currentChat.messages.map(msg => 
+                    msg.id === tempId ? realMessage : msg
+                )
+            }
+        }))
+    },
+
     updateNewMessageReceived: (newMessage) => {
-        const alreadyExists = get().currentChat.messages.some(msg => msg.id === newMessage.id)
-        if (!alreadyExists) {
+        const currentFriendId = get().idFriendCurrentChat;
+
+        // If chat is currently open with sender:
+        if (currentFriendId === newMessage.senderId) {
+            const alreadyExists = get().currentChat.messages.some(msg => msg.id === newMessage.id)
+            if (!alreadyExists) {
+                set((state) => ({
+                    currentChat: {
+                        ...state.currentChat,
+                        messages: [...state.currentChat.messages, newMessage]
+                    }
+                }))
+            }
+        } else {
+            // If chat is not open with sender, trigger floating bottom-right notification
+            const newNotification: IncomingNotification = {
+                id: `${newMessage.id || Date.now()}-${Math.random()}`,
+                senderId: newMessage.senderId,
+                senderName: newMessage.sender.name,
+                senderImage: newMessage.sender.profileImage,
+                content: newMessage.content,
+                createdAt: new Date(newMessage.createdAt)
+            }
+
             set((state) => ({
-                currentChat: {
-                    ...state.currentChat,
-                    messages: [...state.currentChat.messages, newMessage]
-                }
+                // Keep at most 3 latest notifications
+                incomingNotifications: [
+                    ...state.incomingNotifications.filter(n => n.senderId !== newMessage.senderId),
+                    newNotification
+                ].slice(-3)
             }))
         }
+    },
+
+    dismissIncomingNotification: (id) => {
+        set((state) => ({
+            incomingNotifications: state.incomingNotifications.filter(n => n.id !== id)
+        }))
     }
 
 }))

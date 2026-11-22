@@ -1,4 +1,3 @@
-import { User } from "@prisma/client";
 import z from "zod";
 import { UserInfo, userIdSchema, usersFoundInSearch, userDataSchema, chatSchema } from "../schema-zod";
 
@@ -16,6 +15,7 @@ export type FriendOnline = {
     id: number,
     name: string,
     email: string,
+    profileImage?: string | null,
 }
 export type FriendsOnline = FriendOnline[]
 
@@ -28,7 +28,17 @@ export type Message = {
         id: number;
         name: string;
         email: string;
+        profileImage?: string | null;
     };
+};
+
+export type IncomingNotification = {
+    id: string;
+    senderId: number;
+    senderName: string;
+    senderImage?: string | null;
+    content: string;
+    createdAt: Date;
 };
 
 export type CurrentChat = {
@@ -50,11 +60,6 @@ export type CurrentChat = {
 export type MessageFormState = {
     error: string,
     success: boolean,
-    newMessage: {
-        id: number,
-        content: string,
-        createdAt: Date,
-        chatId: number,
-        senderId: number
-    } | null
+    newMessage: (Message & { chatId: number }) | null
 }
+
