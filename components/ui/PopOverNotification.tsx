@@ -1,32 +1,15 @@
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import {
-   ArchiveBoxXMarkIcon,
-   ChevronDownIcon,
-   PencilIcon,
-   Square2StackIcon,
-   AdjustmentsHorizontalIcon,
-   ArrowLeftEndOnRectangleIcon,
-   PencilSquareIcon,
-   TrashIcon,
-   BellAlertIcon,
-   BellIcon,
-} from '@heroicons/react/16/solid'
-import Image from 'next/image'
+import { Menu, MenuButton, MenuItems } from '@headlessui/react'
+import { BellAlertIcon, BellIcon } from '@heroicons/react/16/solid'
 import { useStore } from '@/src/store'
 import { useEffect, useState } from 'react'
 import RequestsNotification from '../users/RequestsNotification'
 
 export default function PopOverNotification() {
    const [existsNotifications, setExistsNotifications] = useState(false)
-
    const requestsReceived = useStore((state) => state.userData.requestsReceived)
 
    useEffect(() => {
-      if (requestsReceived.length) {
-         setExistsNotifications(true)
-      } else {
-         setExistsNotifications(false)
-      }
+      setExistsNotifications(requestsReceived.length > 0)
    }, [requestsReceived])
 
    return (
@@ -43,7 +26,7 @@ export default function PopOverNotification() {
             <MenuItems
                transition
                anchor="bottom end"
-               className="w-100 origin-top-right rounded-xl bg-slate-700 text-sm/6 text-white transition duration-100 ease-out [--anchor-gap:--spacing(1)] focus:outline-none data-closed:scale-95 data-closed:opacity-0"
+               className="w-80 sm:w-96 origin-top-right rounded-xl bg-slate-700 text-sm/6 text-white transition duration-100 ease-out [--anchor-gap:--spacing(1)] focus:outline-none data-closed:scale-95 data-closed:opacity-0 z-50 shadow-2xl"
             >
                <div className="h-px bg-white/5" />
                <div className="pb-4">
@@ -57,7 +40,7 @@ export default function PopOverNotification() {
                         ))}
                      </ul>
                   ) : (
-                     <p className='text-white text-lg mt-2 text-center'>Por el momento no tienes notificaciones</p>
+                     <p className='text-white text-base py-4 text-center'>You have no notifications at the moment</p>
                   )}
                </div>
             </MenuItems>

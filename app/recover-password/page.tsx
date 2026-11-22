@@ -1,46 +1,57 @@
 import Link from 'next/link'
 import React from 'react'
 
-export default function Login() {
+export default function RecoverPassword() {
   return (
-    <div className='flex flex-col lg:grid lg:grid-cols-2 justify-center items-center mt-10 lg:mt-20 px-4 lg:px-0'>
-      <p className="font-black text-2xl sm:text-3xl lg:text-4xl text-center mt-2 hover:text-slate-700 transition-all mx-5 mb-8 lg:m-20 text-shadow-lg">
-        Recupera tu {""}
-        <span className="text-indigo-800 hover:text-indigo-700">Cuenta</span> {""}
-        para empezar a {""}
-        <span className="text-indigo-800 hover:text-indigo-700">Chatear con tus friends</span>
+    <div className="flex flex-col lg:grid lg:grid-cols-2 justify-center items-center min-h-[calc(100vh-70px)] px-4 py-8 gap-8 dark:bg-gray-900">
+      {/* Left text */}
+      <p className="font-black text-3xl sm:text-4xl text-center hover:text-slate-700 dark:text-white dark:hover:text-slate-300 transition-all order-2 lg:order-1">
+        Recover your{' '}
+        <span className="text-indigo-700 dark:text-indigo-400">account</span>{' '}
+        to get back to{' '}
+        <span className="text-indigo-700 dark:text-indigo-400">chatting with your friends</span>
       </p>
 
-      <div className='bg-white rounded-lg shadow-md hover:shadow-xl transition-all p-5 sm:p-8 lg:p-10 mx-2 lg:mr-10 w-full max-w-lg lg:max-w-none'>
-        <p className="font-black text-3xl sm:text-4xl lg:text-5xl text-center text-indigo-700 text-shadow-lg">Recupera Tu Cuenta</p>
-        <form
-          action=""
-          className='flex flex-col items-center mt-6 sm:mt-10 gap-4 sm:gap-5'
-        >
-          <div className='flex flex-col sm:flex-row gap-2 sm:gap-5 items-start sm:items-center w-full justify-center'>
-            <label htmlFor="email" className='font-black text-xl sm:text-2xl lg:text-4xl text-shadow-lg'>Email</label>
+      {/* Form */}
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl hover:shadow-2xl transition-all p-8 sm:p-10 w-full max-w-md order-1 lg:order-2">
+        <p className="font-black text-3xl sm:text-4xl text-center text-indigo-700 dark:text-indigo-400 mb-2">
+          Recover Account
+        </p>
+        <p className="text-center text-slate-500 dark:text-slate-400 text-sm mb-8">
+          Enter your email and we'll send you instructions to reset your password.
+        </p>
+
+        <form className="flex flex-col gap-5">
+          <div className="flex flex-col gap-1">
+            <label htmlFor="email" className="font-bold text-slate-700 dark:text-slate-200 text-sm">
+              Email
+            </label>
             <input
               id='email'
               type="email"
-              className='outline-none shadow-xl border border-slate-200 transition-all p-2 rounded-lg w-full sm:w-auto sm:flex-1 max-w-md'
-              placeholder='Write your E-mail'
+              className="outline-none border border-slate-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 transition-all p-3 rounded-xl w-full focus:border-indigo-400 shadow-sm"
+              placeholder='user@example.com'
             />
           </div>
 
           <input
             type="submit"
-            className='w-fit p-2 mt-5 bg-indigo-500 hover:bg-indigo-600 hover:shadow-md rounded-lg font-black text-xl sm:text-2xl text-white transition-all cursor-pointer'
-            value={'Confirmar'}
+            className="w-full py-3 bg-indigo-700 hover:bg-indigo-600 rounded-xl font-black text-lg text-white transition-all cursor-pointer shadow-md"
+            value='Send Instructions'
           />
 
-          <div>
-            <p className="text-base lg:text-lg text-center transition-all">
-              ¿Ya tienes una cuenta?
-              <Link href={'/'}><span className="text-indigo-800 hover:text-indigo-900 transition-all font-bold"> Inicia Sesión</span></Link>
+          <div className="flex flex-col gap-2 text-center">
+            <p className="text-sm dark:text-slate-300">
+              Already remember your password?{' '}
+              <Link href='/'>
+                <span className="text-indigo-700 dark:text-indigo-400 hover:text-indigo-900 font-bold">Log in</span>
+              </Link>
             </p>
-            <p className="text-base lg:text-lg text-center transition-all">
-              ¿No tienes una cuenta?
-              <Link href={'/sign-up'}><span className="text-indigo-800 hover:text-indigo-900 font-bold"> Crea una cuenta</span></Link>
+            <p className="text-sm dark:text-slate-300">
+              Don't have an account?{' '}
+              <Link href='/sign-up'>
+                <span className="text-indigo-700 dark:text-indigo-400 hover:text-indigo-900 font-bold">Create one</span>
+              </Link>
             </p>
           </div>
         </form>

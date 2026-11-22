@@ -2,11 +2,12 @@
 import { useStore } from '@/src/store'
 import DropDownMenu from './DropDownMenu'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import Link from 'next/link'
 import PopOverNotification from './ui/PopOverNotification'
 import socket from '@/src/lib/socket'
 import { FriendOnline, FriendsOnlineId, Message } from '@/src/types'
+import { ChatBubbleLeftRightIcon } from '@heroicons/react/16/solid'
 
 export default function Header() {
   // State
@@ -29,50 +30,36 @@ export default function Header() {
   // ------------------------//---------- Websockets ---------------//------------
   useEffect(() => {
     // Verificamos si ya cargo el server de Next
-    if (typeof window !== "undefined") {
-      // Ejcutamos sockets
-      if (userId) {
-        socket.connect() // Si encuentra un user conectamos el socket
+    if (typeof window === "undefined") return
 
-        socket.emit('register-user', { userId, friendsId }) // Registrar usuario conectado
-      }
-      if (!userId) {
-        socket.disconnect()
-      }
-      socket.on('update-notifications', () => {
-        getUserData()
-      })
-      socket.on('request-accepted-notification', async (dataFriend: FriendOnline) => {
-        updateFriendOnline(dataFriend)
-      })
-      socket.on('friends-online', (friendsOnline: FriendsOnlineId) => {
-        updateOnlineFriends(friendsOnline)
-      })
-      socket.on('friend-connected', (friendId: FriendOnline['id']) => {
-        updateUserConnected(friendId)
-      })
-      socket.on('friend-removed-notification', (friendId: FriendOnline['id']) => {
-        updateFriendRemovedNotification(friendId)
-      })
-      socket.on('friend-disconnected', (userDisconnected: FriendOnline['id']) => {
-        updateUserDisconnected(userDisconnected)
-      })
-      // Update New Message Received
-      socket.on('new-message', (newMessage: Message) => {
-        updateNewMessageReceived(newMessage)
-      })
+    // Ejcutamos sockets
+    if (userId) {
+      socket.connect()
+      socket.emit('register-user', { userId, friendsId })
+    } else {
+      socket.disconnect()
     }
 
+    // Register socket listeners
+    socket.on('update-notifications', () => { getUserData() })
+    socket.on('request-accepted-notification', (dataFriend: FriendOnline) => { updateFriendOnline(dataFriend) })
+    socket.on('friends-online', (friendsOnline: FriendsOnlineId) => { updateOnlineFriends(friendsOnline) })
+    socket.on('friend-connected', (friendId: FriendOnline['id']) => { updateUserConnected(friendId) })
+    socket.on('friend-removed-notification', (friendId: FriendOnline['id']) => { updateFriendRemovedNotification(friendId) })
+    socket.on('friend-disconnected', (userDisconnected: FriendOnline['id']) => { updateUserDisconnected(userDisconnected) })
+    // Update New Message Received
+    socket.on('new-message', (newMessage: Message) => { updateNewMessageReceived(newMessage) })
+
     // Cleanup: remover listeners al re-ejecutar el efecto o desmontar
-    /*  return () => {
-       socket.off('update-notifications')
-       socket.off('request-accepted-notification')
-       socket.off('friends-online')
-       socket.off('friend-connected')
-       socket.off('friend-removed-notification')
-       socket.off('friend-disconnected')
-       socket.off('new-message')
-     } */
+    return () => {
+      socket.off('update-notifications')
+      socket.off('request-accepted-notification')
+      socket.off('friends-online')
+      socket.off('friend-connected')
+      socket.off('friend-removed-notification')
+      socket.off('friend-disconnected')
+      socket.off('new-message')
+    }
   }, [userId])
 
   // ------ Check exists a session saved ----------
@@ -86,18 +73,20 @@ export default function Header() {
     getUserData()
   }, [token])
 
-  if (userData) {
-  }
-
   return (
-    <header className="flex items-center justify-between bg-slate-800 px-3 py-3 sm:px-6 sm:py-4">
-      <Link href={'/dashboard'}>
-        <h1 className="text-lg sm:text-2xl lg:text-4xl font-black text-white text-shadow-lg hover:scale-101 transition shadow-lg shadow-white/10 w-fit rounded-lg">Chat App NextJs</h1>
+    <header className="flex items-center justify-between bg-slate-800 dark:bg-gray-950 px-3 py-3 sm:px-6 sm:py-4 shadow-lg flex-shrink-0">
+      <Link href={'/dashboard'} className="flex items-center gap-2 hover:scale-101 transition">
+        <ChatBubbleLeftRightIcon className="w-7 h-7 text-indigo-400" />
+        <h1 className="text-lg sm:text-2xl lg:text-3xl font-black text-white">
+          ChatApp
+        </h1>
       </Link>
       {userData.email && (
-        <div className="flex items-center gap-2 sm:gap-5 lg:gap-10">
+        <div className="flex items-center gap-2 sm:gap-5">
           <PopOverNotification />
-          <p className="text-white font-black hidden sm:block text-sm lg:text-base">¡Hola {userData.name}!</p>
+          <p className="text-white font-semibold hidden sm:block text-sm">
+            Hello, <span className="font-black">{userData.name}</span>!
+          </p>
           <DropDownMenu />
         </div>
       )}

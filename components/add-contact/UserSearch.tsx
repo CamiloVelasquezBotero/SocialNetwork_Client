@@ -2,80 +2,89 @@
 import { useEffect, useState } from "react";
 import FoundUsers from "./FoundUsers";
 import api from "@/src/lib/axios";
-import { UserData, UsersFoundInSearch } from "@/src/types";
+import { UsersFoundInSearch } from "@/src/types";
 import { usersFoundInSearch } from "@/src/schema-zod";
 import Spinner from "../ui/Spinner";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { ArrowLeftIcon } from "@heroicons/react/16/solid";
 
 export default function UserSearch() {
     const [isLoading, setIsLoading] = useState(false)
     const [query, setQuery] = useState<string>('')
     const [users, setUsers] = useState<UsersFoundInSearch>([])
 
-    const router =  useRouter()
+    const router = useRouter()
 
     useEffect(() => {
+        if (!query.length) {
+            setUsers([])
+            return
+        }
         const fetchUsers = async () => {
             try {
-                setIsLoading(true) // Activamos spinner
-                const {data} = await api.get(`/api/add-contact?query=${query}`)
+                setIsLoading(true)
+                const { data } = await api.get(`/api/add-contact?query=${query}`)
                 const result = usersFoundInSearch.safeParse(data)
-                if(!result.success) {
-                  return toast.error("Hubo un error en la busqueda")
+                if (!result.success) {
+                    return toast.error("Error searching for contacts")
                 }
                 // Mostramos los usuarios
                 setUsers(result.data)
-                setIsLoading(false) // Spinner off
             } catch (error) {
-                console.log('There was an error fetching the users')
+                toast.error('Error searching for contacts')
+            } finally {
+                setIsLoading(false)
             }
         }
-        if(query.length) {
-          fetchUsers()
-        } 
+
+        const timer = setTimeout(fetchUsers, 400)
+        return () => clearTimeout(timer)
     }, [query])
 
-  return (
-    <div className='bg-white w-full max-w-3xl rounded-xl h-auto min-h-[400px] lg:h-135 shadow-md mx-auto lg:mx-0 px-3 sm:px-0'>
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-5 lg:gap-10 mt-[3%] px-3 sm:px-0">
-          <button 
-            className="ml-0 sm:ml-[5%] shadow-2xl text-shadow-2xl p-2 transition-all bg-cyan-900 hover:bg-cyan-800 hover:scale-101 text-white font-bold text-base sm:text-xl rounded-xl cursor-pointer w-fit"
-            onClick={() => router.push('/dashboard')}
-          >
-            Regresar
-          </button>
-          <p className="font-black text-2xl sm:text-3xl lg:text-4xl">
-            Encuentra a tu <span className="text-indigo-800 text-shadow-2xl">Contacto</span>
-          </p>
+    return (
+        <div className='bg-white dark:bg-gray-800 w-full max-w-3xl rounded-2xl min-h-[400px] lg:h-auto shadow-xl mx-auto lg:mx-0'>
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-5 p-4 border-b border-slate-100 dark:border-gray-700">
+                <button
+                    className="flex items-center gap-1.5 shadow-md p-2 px-4 transition-all bg-cyan-900 hover:bg-cyan-800 text-white font-bold rounded-xl cursor-pointer w-fit text-sm"
+                    onClick={() => router.push('/dashboard')}
+                >
+                    <ArrowLeftIcon className="w-4 h-4" />
+                    Back
+                </button>
+                <p className="font-black text-xl sm:text-2xl dark:text-white">
+                    Find a <span className="text-indigo-700 dark:text-indigo-400">Contact</span>
+                </p>
+            </div>
+
+            <div className="p-4">
+                <div className='flex flex-col sm:flex-row gap-2 sm:gap-3 mb-4'>
+                    <label
+                        htmlFor="querySearch"
+                        className='font-bold text-base sm:text-lg dark:text-slate-200 flex-shrink-0 self-center'
+                    >
+                        Email or Name:
+                    </label>
+                    <input
+                        id='querySearch'
+                        type="text"
+                        placeholder="Type contact's email or name"
+                        className='outline-none p-2 border border-slate-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 rounded-lg w-full focus:border-indigo-400 transition shadow-sm'
+                        value={query}
+                        onChange={e => setQuery(e.target.value)}
+                    />
+                </div>
+
+                <div className="mt-4">
+                    {isLoading ? (
+                        <div className="flex justify-center py-8">
+                            <Spinner />
+                        </div>
+                    ) : (
+                        <FoundUsers users={users} />
+                    )}
+                </div>
+            </div>
         </div>
-
-        <form>
-          <div className='flex flex-col sm:flex-row justify-center gap-2 sm:gap-3 mt-5 px-3 sm:px-0'>
-            <label 
-              htmlFor="querySearch" 
-              className='font-bold text-lg sm:text-xl lg:text-2xl'
-            >Email o Nombre:</label>
-            <input
-              id='querySearch'
-              type="text"
-              placeholder='Escribe el "Email" o "Nombre" de tu contacto'
-              className='outline-none p-2 shadow-md w-full sm:w-auto sm:flex-1 max-w-md'
-              value={query}
-              onChange={e => setQuery(e.target.value)}
-            />
-          </div>
-        </form>
-
-          <div className="flex justify-center mt-5 w-auto px-2 sm:px-0">
-            {isLoading ? (
-              <Spinner />
-            ): (
-              <FoundUsers
-                  users={users}
-              />
-            )}
-          </div>
-      </div>
-  )
+    )
 }

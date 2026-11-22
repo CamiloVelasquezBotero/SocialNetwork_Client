@@ -5,6 +5,9 @@ type UserFormProps = {
     condition: 'sign up' | 'log in'
 }
 
+const inputClass = 'outline-none border border-slate-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 transition-all p-3 rounded-xl w-full focus:border-indigo-400 shadow-sm'
+const labelClass = 'font-bold text-slate-700 dark:text-slate-200 text-sm'
+
 export default function UserForm({ condition }: UserFormProps) {
     const [values, setValues] = useState({
         name: '',
@@ -12,6 +15,7 @@ export default function UserForm({ condition }: UserFormProps) {
         password: '',
         confirmPas: '',
     })
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setValues({
             ...values,
@@ -28,53 +32,56 @@ export default function UserForm({ condition }: UserFormProps) {
     return (
         <>
             {condition === 'sign up' && (
-                <div className='flex flex-col sm:flex-row gap-2 sm:gap-5 items-start sm:items-center w-full justify-center'>
-                    <label htmlFor="name" className='font-black text-xl sm:text-2xl lg:text-4xl text-shadow-lg'>Name</label>
+                <div className="flex flex-col gap-1">
+                    <label htmlFor="name" className={labelClass}>Name</label>
                     <input
                         id="name"
-                        type="name"
+                        type="text"
                         name='name'
-                        className='outline-none shadow-xl border border-slate-200 transition-all p-2 rounded-lg w-full sm:w-auto sm:flex-1 max-w-md'
-                        placeholder='¿What is your name?'
-                        onChange={e => handleChange(e)}
+                        className={inputClass}
+                        placeholder='What is your name?'
+                        onChange={handleChange}
                         value={values.name}
                     />
                 </div>
             )}
-            <div className='flex flex-col sm:flex-row gap-2 sm:gap-5 items-start sm:items-center w-full justify-center'>
-                <label htmlFor="email" className='font-black text-xl sm:text-2xl lg:text-4xl text-shadow-lg'>Email</label>
+
+            <div className="flex flex-col gap-1">
+                <label htmlFor="email" className={labelClass}>Email</label>
                 <input
                     id="email"
                     type="email"
                     name='email'
-                    className='outline-none shadow-xl border border-slate-200 transition-all p-2 rounded-lg w-full sm:w-auto sm:flex-1 max-w-md'
-                    placeholder='Write your E-mail'
-                    onChange={e => handleChange(e)}
+                    className={inputClass}
+                    placeholder='user@example.com'
+                    onChange={handleChange}
                     value={values.email}
                 />
             </div>
-            <div className='flex flex-col sm:flex-row gap-2 sm:gap-5 items-start sm:items-center w-full justify-center'>
-                <label htmlFor="password" className='font-black text-xl sm:text-2xl lg:text-4xl text-shadow-lg'>Password</label>
+
+            <div className="flex flex-col gap-1">
+                <label htmlFor="password" className={labelClass}>Password</label>
                 <input
                     id="password"
                     type="password"
                     name='password'
-                    className='outline-none shadow-xl border border-slate-200 transition-all p-2 rounded-lg w-full sm:w-auto sm:flex-1 max-w-md'
-                    placeholder='Write your password'
-                    onChange={e => handleChange(e)}
+                    className={inputClass}
+                    placeholder='Minimum 5 characters'
+                    onChange={handleChange}
                     value={values.password}
                 />
             </div>
+
             {condition === 'sign up' && (
-                <div className='flex flex-col sm:flex-row gap-2 sm:gap-5 items-start sm:items-center w-full justify-center'>
-                    <label htmlFor="confirmPas" className='font-black text-xl sm:text-2xl lg:text-4xl text-shadow-lg'>Confirm</label>
+                <div className="flex flex-col gap-1">
+                    <label htmlFor="confirmPas" className={labelClass}>Confirm Password</label>
                     <input
                         id="confirmPas"
                         type="password"
                         name='confirmPas'
-                        className='outline-none shadow-xl border border-slate-200 transition-all p-2 rounded-lg w-full sm:w-auto sm:flex-1 max-w-md'
-                        placeholder='Confirm your password'
-                        onChange={e => handleChange(e)}
+                        className={inputClass}
+                        placeholder='Repeat your password'
+                        onChange={handleChange}
                         value={values.confirmPas}
                     />
                 </div>
@@ -82,7 +89,7 @@ export default function UserForm({ condition }: UserFormProps) {
 
             <input
                 type="submit"
-                className='text-shadow-md w-fit p-2 mt-5 bg-indigo-700 hover:bg-indigo-600 hover:shadow-md rounded-lg font-black text-xl sm:text-2xl text-white transition-all cursor-pointer'
+                className='w-full py-3 mt-2 bg-indigo-700 hover:bg-indigo-600 rounded-xl font-black text-lg text-white transition-all cursor-pointer shadow-md'
                 value={valueSubmit}
             />
         </>

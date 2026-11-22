@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken'
 export async function GET(req:Request) {
     const { searchParams } = new URL(req.url)
     const query = searchParams.get('query')
-    if(!query) return Response.json({error: 'Query no encontrada'}, {status: 400})
+    if(!query) return Response.json({error: 'Query parameter not found'}, {status: 400})
 
     try {
         const users = await prisma.user.findMany({
@@ -16,7 +16,7 @@ export async function GET(req:Request) {
                         {name: {contains: query, mode: 'insensitive'}}
                     ] 
             },
-            select: {id:true, email:true, name:true}
+            select: {id:true, email:true, name:true, profileImage:true}
         })
         return Response.json(users)
     } catch (error) {

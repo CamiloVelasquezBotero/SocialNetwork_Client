@@ -19,7 +19,7 @@ export async function getOrCreateChat(userId: number, friendId: number) {
             include: {
                 users: { 
                     include: { 
-                        user: { select: { id:true, name:true, email:true } }
+                        user: { select: { id: true, name: true, email: true, profileImage: true } }
                     }
                 },
                 messages: {
@@ -34,7 +34,7 @@ export async function getOrCreateChat(userId: number, friendId: number) {
             let newChat = await prisma.chat.create({ data: {} })
 
             // Creamos los registros de la tabla pivote ChatUser para vincular al chat creado
-            let chatUser = await prisma.chatUser.createMany({
+            await prisma.chatUser.createMany({
                 data: [
                     { chatId: newChat.id, userId },
                     { chatId: newChat.id, userId: friendId }
@@ -59,8 +59,7 @@ export async function getOrCreateChat(userId: number, friendId: number) {
             return chatExists
         }
     } catch (error) {
-        console.log('There was an error trying to get the chat')
-        return {error: 'Hubo un error al tratar de obtener el chat'}
+        console.log('Error getting chat:', error)
+        return { error: 'Error getting chat, please try again' }
     }
-
 }

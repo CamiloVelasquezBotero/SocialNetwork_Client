@@ -5,11 +5,11 @@ type FoundUsersProps = {
   users: UsersFoundInSearch
 }
 
-export default function FoundUsers({users}:FoundUsersProps) {
+export default function FoundUsers({ users }: FoundUsersProps) {
   return (
     <>
         {users.length ? (
-          <ul className="flex flex-col gap-1 h-auto max-h-[380px] lg:h-95 overflow-y-auto p-1 shadow-xl w-full px-2 sm:px-4">
+          <ul className="flex flex-col gap-1.5 h-auto max-h-[380px] lg:h-95 overflow-y-auto p-1 shadow-inner w-full px-1">
             {users.map((user) => (
                 <User
                   key={user.email}
@@ -18,7 +18,9 @@ export default function FoundUsers({users}:FoundUsersProps) {
             ))}
           </ul>
         ) : (
-          <p className="font-bold text-lg sm:text-2xl text-slate-600 mt-10 text-center">No se encontraron usuarios similares</p>
+          <p className="font-bold text-base sm:text-xl text-slate-500 dark:text-slate-400 mt-10 text-center">
+            No contacts found
+          </p>
         )}
     </>
   )

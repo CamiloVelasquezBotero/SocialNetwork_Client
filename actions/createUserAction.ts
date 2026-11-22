@@ -3,10 +3,10 @@ import { userRegisterSchema } from '@/src/schema-zod'
 import { prisma } from '../src/prisma-connection/prisma'
 import bcrypt from 'bcrypt'
 
-export async function createUser(data:unknown) {
+export async function createUser(data: unknown) {
     const result = userRegisterSchema.safeParse(data)
-    if(!result.success) {
-        return {errors: result.error.issues}
+    if (!result.success) {
+        return { errors: result.error.issues }
     }
 
     try {
@@ -16,9 +16,9 @@ export async function createUser(data:unknown) {
                 email: result.data.email
             }
         })
-        if(userExists) {
-            return {errors: [{message: 'This Email already exists'}]}
-        } 
+        if (userExists) {
+            return { errors: [{ message: 'This Email already exists' }] }
+        }
 
         // we have to hash the password first before to save it
         const passwordHashed = await bcrypt.hash(result.data.password, 10)

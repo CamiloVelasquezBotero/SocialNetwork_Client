@@ -1,31 +1,36 @@
 'use client'
-import React, { useEffect } from 'react'
+import React from 'react'
 import Link from 'next/link'
-import { CursorArrowRaysIcon } from '@heroicons/react/16/solid'
+import { CursorArrowRaysIcon, ArrowLeftIcon, UserGroupIcon } from '@heroicons/react/16/solid'
 import { useStore } from '@/src/store'
 import FriendInfo from '@/components/contact-list/FriendInfo'
 import { useRouter } from 'next/navigation'
 
-export default function contactList() {
+export default function ContactList() {
    const friends = useStore((state) => state.userData.friends)
-
    const router = useRouter()
 
    return (
-      <div className='flex justify-center w-full h-screen p-2 sm:p-5'>
-         <div className='bg-white w-full max-w-7xl h-[85%] shadow-2xl rounded-2xl p-4 sm:p-6 lg:p-10 pt-3 sm:pt-5'>
-            <div className='flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-0 mb-5'>
+      <div className="flex justify-center w-full min-h-[calc(100vh-70px)] p-2 sm:p-5 dark:bg-gray-900">
+         <div className="bg-white dark:bg-gray-800 w-full max-w-5xl h-fit min-h-[85vh] shadow-2xl rounded-2xl p-4 sm:p-6 lg:p-10">
+
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
                <button
-                  className="sm:ml-[5%] shadow-2xl p-2 transition-all bg-cyan-900 hover:bg-cyan-800 hover:scale-101 text-white font-bold text-base sm:text-xl rounded-xl cursor-pointer"
+                  className="flex items-center gap-1.5 shadow-md p-2 px-4 transition-all bg-cyan-900 hover:bg-cyan-800 text-white font-bold rounded-xl cursor-pointer text-sm"
                   onClick={() => router.push('/dashboard')}
                >
-                  Regresar
+                  <ArrowLeftIcon className="w-4 h-4" />
+                  Back
                </button>
-               <p className="font-black text-2xl text-center pr-30 sm:text-left hover:text-slate-700 transition-all text-shadow-lg sm:ml-auto sm:mr-auto text-shadow-2xl">
-                  Tu lista de <span className="text-indigo-800 hover:text-indigo-700">Contactos</span>
+               <p className="font-black text-2xl sm:text-3xl text-center sm:text-left dark:text-white sm:mx-auto text-shadow-lg">
+                  My <span className="text-indigo-700 dark:text-indigo-400">Contacts</span>
+                  <span className="ml-2 text-base font-semibold text-slate-400">({friends?.length || 0})</span>
                </p>
             </div>
-            <ul className='grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-5 px-2 sm:px-6 lg:px-30 overflow-y-auto h-[90%] p-2 items-start content-start'>
+
+            {/* Contacts list */}
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                {friends && friends.length ? (
                   friends.map(friend => (
                      <FriendInfo
@@ -34,13 +39,15 @@ export default function contactList() {
                      />
                   ))
                ) : (
-                  <p className="md:flex flex-wrap font-bold text-xl text-slate-600 gap-2 col-span-full mx-auto mt-20">
-                     Aun no tienes friends agregados,
-                     <Link href={'/add-contact'} className='flex font-bold text-lime-500 gap-2 hover:text-shadow-md'>
-                        empieza a agregarlos <CursorArrowRaysIcon className='w-8 h-8 sm:w-10 sm:h-10' />
+                  <div className="col-span-full flex flex-col items-center justify-center py-20 gap-4">
+                     <UserGroupIcon className="w-16 h-16 text-slate-400 dark:text-slate-500" />
+                     <p className="font-bold text-xl text-slate-500 dark:text-slate-400 text-center">
+                        No contacts added yet
+                     </p>
+                     <Link href='/add-contact' className="flex items-center gap-2 font-bold text-indigo-700 dark:text-indigo-400 hover:underline text-lg">
+                        Search and add contacts <CursorArrowRaysIcon className="w-6 h-6" />
                      </Link>
-
-                  </p>
+                  </div>
                )}
             </ul>
          </div>

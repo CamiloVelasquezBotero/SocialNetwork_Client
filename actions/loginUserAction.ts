@@ -17,23 +17,23 @@ export async function loginUser(data: unknown) { // TODO: VERIFICAR EL TIPADO PO
                 email: result.data.email
             }
         })
-        if(!userExists) {
-            return {errors: [{message: 'This Email is not registered'}]}
+        if (!userExists) {
+            return { errors: [{ message: 'This Email is not registered' }] }
         }
 
         // Check password
         const passwordMatch = await bcrypt.compare(result.data.password, userExists.password)
-        if(!passwordMatch) {
-            return {errors: [{message: 'The password is incorrect'}]}
+        if (!passwordMatch) {
+            return { errors: [{ message: 'The password is incorrect' }] }
         }
 
         // Create JWT to save the user
         const token = jwt.sign(
             {
-                id:userExists.id, name:userExists.name, email:userExists.email
-            }, 
-            process.env.SECRET_KEY!, 
-            {expiresIn: '30d'}
+                id: userExists.id, name: userExists.name, email: userExists.email
+            },
+            process.env.SECRET_KEY!,
+            { expiresIn: '30d' }
         )
         // Datos de usuario
         const dataUser = {
@@ -42,9 +42,9 @@ export async function loginUser(data: unknown) { // TODO: VERIFICAR EL TIPADO PO
         }
 
         // Return the user
-        return {token, dataUser}
+        return { token, dataUser }
     } catch (error) {
         console.log('There was an error when try to log in', error)
-        return {error: 'There was an error when try to log in'}
+        return { error: 'There was an error when try to log in' }
     }
 }

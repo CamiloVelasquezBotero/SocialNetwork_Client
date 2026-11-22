@@ -18,7 +18,7 @@ export async function GET(req:Request) {
                     id: decoded.id
                 },
                 include: {
-                    friends: { select: {id: true, name: true, email: true} },
+                    friends: { select: {id: true, name: true, email: true, profileImage: true} },
                     requestsSent: {
                         select: {id:true, name:true, email:true}
                     },
@@ -123,7 +123,7 @@ export async function PATCH(req: Request) {
 export async function DELETE(req: Request) {
     const { searchParams } = new URL(req.url)
     const queryFriendId = Number(searchParams.get('friendId'))
-    if(!queryFriendId) return Response.json({error: '¡FriendId no encontrada!'}, {status:400})
+    if(!queryFriendId) return Response.json({error: 'Friend ID not found'}, {status:400})
     const bearer = req.headers.get('authorization')
     
     if(!bearer || !bearer.startsWith('Bearer')) {
@@ -149,7 +149,7 @@ export async function DELETE(req: Request) {
             }
         })
         if(!existsFriend || existsFriend.friends.length === 0) {
-            return Response.json({error: 'Amigo no encontrado'}, {status: 401})
+            return Response.json({error: 'Friend not found'}, {status: 404})
         }
         
         // Si pasa atualizamos amigos...
