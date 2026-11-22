@@ -1,10 +1,8 @@
 'use server'
 import { prisma } from '@/src/prisma-connection/prisma'
 import jwt from 'jsonwebtoken'
-import { writeFile } from 'fs/promises'
-import path from 'path'
 
-// POST - Upload profile picture
+// POST - Upload profile picture (converts to Base64 and saves in DB for full Vercel serverless support)
 export async function POST(req: Request) {
     const bearer = req.headers.get('authorization')
     if (!bearer || !bearer.startsWith('Bearer')) {
@@ -30,26 +28,20 @@ export async function POST(req: Request) {
             return Response.json({ error: 'Only images are allowed' }, { status: 400 })
         }
 
-        if (file.size > 5 * 1024 * 1024) {
-            return Response.json({ error: 'Image cannot exceed 5MB' }, { status: 400 })
+        if (file.size > 4 * 1024 * 1024) {
+            return Response.json({ error: 'Image cannot exceed 4MB' }, { status: 400 })
         }
-
-        const extension = file.name.split('.').pop()
-        const fileName = `profile_${userId}_${Date.now()}.${extension}`
-        const filePath = path.join(process.cwd(), 'public', 'uploads', fileName)
 
         const bytes = await file.arrayBuffer()
         const buffer = Buffer.from(bytes)
-        await writeFile(filePath, buffer)
-
-        const publicImageUrl = `/uploads/${fileName}`
+        const base64Image = `data:${file.type};base64,${buffer.toString('base64')}`
 
         await prisma.user.update({
             where: { id: userId },
-            data: { profileImage: publicImageUrl }
+            data: { profileImage: base64Image }
         })
 
-        return Response.json({ profileImage: publicImageUrl }, { status: 200 })
+        return Response.json({ profileImage: base64Image }, { status: 200 })
     } catch (error) {
         console.log('Error uploading image:', error)
         return Response.json({ error: 'Error uploading image' }, { status: 500 })
