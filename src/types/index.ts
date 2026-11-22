@@ -1,5 +1,5 @@
 import z from "zod";
-import { UserInfo, userIdSchema, usersFoundInSearch, userDataSchema, chatSchema } from "../schema-zod";
+import { UserInfo, userIdSchema, usersFoundInSearch, userDataSchema } from "../schema-zod";
 
 export type UserData = z.infer<typeof userDataSchema>
 

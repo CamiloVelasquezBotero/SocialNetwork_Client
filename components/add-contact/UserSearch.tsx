@@ -31,7 +31,7 @@ export default function UserSearch() {
                 }
                 // Mostramos los usuarios
                 setUsers(result.data)
-            } catch (error) {
+            } catch {
                 toast.error('Error searching for contacts')
             } finally {
                 setIsLoading(false)

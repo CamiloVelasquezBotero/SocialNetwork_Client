@@ -1,6 +1,5 @@
 'use server'
 import { prisma } from "@/src/prisma-connection/prisma";
-import jwt from 'jsonwebtoken'
 
 // FIND CONTACTS FOR SEARCHING
 export async function GET(req:Request) {

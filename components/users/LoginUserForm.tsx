@@ -68,7 +68,7 @@ export default function LoginUserForm({ children }: { children: React.ReactNode 
 
                <div className="flex flex-col gap-2 mt-2 text-center">
                   <p className="text-sm dark:text-slate-300">
-                     Don't have an account?{' '}
+                     Don&apos;t have an account?{' '}
                      <Link href='/sign-up'>
                         <span className="text-indigo-700 dark:text-indigo-400 hover:text-indigo-900 font-bold">Sign up here</span>
                      </Link>

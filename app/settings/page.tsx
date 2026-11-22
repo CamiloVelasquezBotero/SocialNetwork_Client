@@ -30,7 +30,7 @@ export default function SettingsPage() {
         if (!userData.email) {
             router.push('/')
         }
-    }, [userData])
+    }, [userData, router])
 
     // Image preview on file selection
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,8 +76,9 @@ export default function SettingsPage() {
             updateProfileImage(response.data.profileImage)
             toast.success('Profile picture updated successfully!')
             setPreviewImage(null)
-        } catch (error: any) {
-            const message = error?.response?.data?.error || 'Error uploading image'
+        } catch (error) {
+            const err = error as { response?: { data?: { error?: string } } }
+            const message = err?.response?.data?.error || 'Error uploading image'
             toast.error(message)
         } finally {
             setIsLoadingImage(false)
@@ -114,8 +115,9 @@ export default function SettingsPage() {
 
             toast.success(response.data.message || 'Password updated successfully')
             setPasswords({ currentPassword: '', newPassword: '', confirmNewPassword: '' })
-        } catch (error: any) {
-            const message = error?.response?.data?.error || 'Error changing password'
+        } catch (error) {
+            const err = error as { response?: { data?: { error?: string } } }
+            const message = err?.response?.data?.error || 'Error changing password'
             toast.error(message)
         } finally {
             setIsLoadingPassword(false)

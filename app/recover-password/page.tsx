@@ -18,7 +18,7 @@ export default function RecoverPassword() {
           Recover Account
         </p>
         <p className="text-center text-slate-500 dark:text-slate-400 text-sm mb-8">
-          Enter your email and we'll send you instructions to reset your password.
+          Enter your email and we&apos;ll send you instructions to reset your password.
         </p>
 
         <form className="flex flex-col gap-5">
@@ -48,7 +48,7 @@ export default function RecoverPassword() {
               </Link>
             </p>
             <p className="text-sm dark:text-slate-300">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <Link href='/sign-up'>
                 <span className="text-indigo-700 dark:text-indigo-400 hover:text-indigo-900 font-bold">Create one</span>
               </Link>
