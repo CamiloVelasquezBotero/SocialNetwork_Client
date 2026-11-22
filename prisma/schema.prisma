@@ -11,7 +11,8 @@ model User {
   id                Int     @id @default(autoincrement())
   name              String  
   email             String  @unique
-  password          String  
+  password          String
+  profileImage      String? // Foto de perfil (opcional)
   friends           User[]  @relation("Friends")
   friendOf          User[]  @relation("Friends") // Pivote
   requestsSent      User[]  @relation("Requests")     
