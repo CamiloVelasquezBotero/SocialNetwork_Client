@@ -7,6 +7,31 @@ A full-featured real-time chat application built with **Next.js 15**, **Socket.i
 
 ---
 
+## Live Demo
+
+The application is fully deployed and available at:
+
+**[https://social-network-client-nine.vercel.app](https://social-network-client-nine.vercel.app)**
+
+| Service | URL | Platform |
+| :--- | :--- | :--- |
+| Frontend | [social-network-client-nine.vercel.app](https://social-network-client-nine.vercel.app) | Vercel |
+| Backend (WebSockets) | [socialnetwork-server-zwk7.onrender.com](https://socialnetwork-server-zwk7.onrender.com) | Render |
+| Database | Neon PostgreSQL (serverless) | Neon |
+
+### Test Account
+
+You can log in directly with the following credentials to explore all features without registering:
+
+| Field | Value |
+| :--- | :--- |
+| Email | `test@correo.com` |
+| Password | `password` |
+
+> You can also **create your own account** from the sign-up page, search for other users, send friend requests, and test the real-time chat between two browser tabs or devices.
+
+---
+
 ## Features
 
 - **Real-time messaging** — Messages are delivered instantly via Socket.io with optimistic UI (the message appears immediately without waiting for the server response).
